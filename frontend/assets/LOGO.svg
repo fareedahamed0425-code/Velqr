@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <defs>
+        <linearGradient id="premium-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#00F5FF;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#7000ff;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <!-- Background Frame -->
+    <rect x="40" y="40" width="432" height="432" rx="80" fill="rgba(255,255,255,0.05)" />
+    
+    <!-- Bold Stylized 'V' combining QR elements -->
+    <path d="M128 128 L256 384 L384 128" 
+          stroke="url(#premium-gradient)" 
+          stroke-width="64" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none" />
+    
+    <!-- Accent QR blocks -->
+    <rect x="224" y="240" width="64" height="64" rx="12" fill="url(#premium-gradient)" />
+    <rect x="180" y="150" width="32" height="32" rx="6" fill="#00F5FF" />
+    <rect x="300" y="150" width="32" height="32" rx="6" fill="#7000ff" />
+    
+    <!-- Glow Effect -->
+    <path d="M128 128 L256 384 L384 128" 
+          stroke="url(#premium-gradient)" 
+          stroke-width="64" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none" 
+          opacity="0.3"
+          filter="blur(15px)" />
+</svg>

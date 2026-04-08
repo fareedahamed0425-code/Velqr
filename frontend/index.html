@@ -5,6 +5,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Velqr - Ethereal QR Generation</title>
+    <link rel="icon" type="image/svg+xml" href="assets/LOGO.svg?v=2">
+    <link rel="apple-touch-icon" href="assets/LOGO.svg">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"
@@ -102,8 +104,11 @@
         class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-2xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]">
         <div
             class="flex justify-between items-center px-4 md:px-8 h-20 max-w-7xl mx-auto font-['Plus_Jakarta_Sans'] tracking-wider">
-            <div id="nav-logo" class="text-2xl font-bold tracking-tighter text-white transition-all duration-500" style="filter: drop-shadow(0 0 8px rgba(0,245,255,0.5))">
-                Velqr
+            <div id="nav-logo" class="flex items-center gap-3 cursor-pointer group transition-all duration-500">
+                <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:border-primary/50 transition-all shadow-lg group-hover:shadow-primary/20 overflow-hidden">
+                    <img src="assets/LOGO.svg" alt="Velqr Logo" class="w-full h-full object-cover p-1.5 group-hover:scale-110 transition-transform">
+                </div>
+                <span class="text-2xl font-black tracking-tighter text-white" style="filter: drop-shadow(0 0 8px rgba(0,245,255,0.3))">Velqr</span>
             </div>
             <div class="flex items-center relative" id="nav-container">
                 <a class="nav-link text-[#00F5FF] cursor-pointer text-xs md:text-base whitespace-nowrap transition-colors duration-300 px-4 py-2 inline-flex items-center"
