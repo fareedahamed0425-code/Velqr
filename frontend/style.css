@@ -1,7 +1,12 @@
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    cursor: none;
     overflow-x: hidden;
+}
+
+@media (min-width: 768px) {
+    body {
+        cursor: none;
+    }
 }
 
 .material-symbols-outlined {
@@ -95,4 +100,21 @@ body {
         transform: scale(1) translateY(0) rotate(0);
         filter: blur(0);
     }
+}
+
+.tonal-shift {
+    box-shadow: 0 -20px 40px -20px rgba(0, 245, 255, 0.05);
+}
+
+.footer-link-glow:hover {
+    text-shadow: 0 0 10px rgba(161, 250, 255, 0.5);
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
 }
