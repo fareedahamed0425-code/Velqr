@@ -44,6 +44,4 @@ backend/
 3. **Access the App**:
    Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your web browser.
 
----
 
-*Built with ❤️ by Antigravity*
