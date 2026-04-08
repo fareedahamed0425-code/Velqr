@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- QR Generation Logic ---
+    // --- Helper Functions ---
     function isValidUrl(string) {
         try {
             const url = new URL(string);
@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- QR Generation Logic ---
     async function generateQR() {
         const url = urlInput.value.trim();
         
@@ -129,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     }
 
-    // Tab Switching Logic
+    // --- Tab Switching Logic ---
     const navGenerator = document.getElementById('nav-generator');
     const navShortener = document.getElementById('nav-shortener');
     const generatorSection = document.getElementById('generator-section');
@@ -208,7 +209,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status === 'success') {
                 shortenPlaceholder.classList.add('hidden');
                 shortenResult.classList.remove('hidden');
-                shortUrlText.textContent = data.short_url;
+                
+                // Use the functional_url for display as it contains the correct domain
+                shortUrlText.textContent = data.functional_url || data.short_url;
                 
                 // Add test link support
                 const testLink = document.getElementById('test-link');
@@ -245,16 +248,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function copyToClipboard() {
-        const text = shortUrlText.textContent;
+        const text = shortUrlText.textContent.trim();
         navigator.clipboard.writeText(text).then(() => {
-            const originalText = copyBtn.innerHTML;
+            const originalContent = copyBtn.innerHTML;
             copyBtn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Copied!';
             setTimeout(() => {
-                copyBtn.innerHTML = originalText;
+                copyBtn.innerHTML = originalContent;
             }, 2000);
         });
     }
 
+    // --- Event Listeners ---
+    // Shortener
     shortenBtn.addEventListener('click', shortenURL);
     shortenClearBtn.addEventListener('click', clearShortener);
     copyBtn.addEventListener('click', copyToClipboard);
@@ -263,105 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') shortenURL();
     });
 
-    // --- QR Generation Logic (unchanged from original but integrated) ---
-    function isValidUrl(string) {
-        try {
-            const url = new URL(string);
-            return url.protocol === "http:" || url.protocol === "https:";
-        } catch (_) {
-            return false;
-        }
-    }
-
-    async function generateQR() {
-        const url = urlInput.value.trim();
-        
-        if (!isValidUrl(url)) {
-            errorMessage.classList.remove('hidden');
-            urlInput.classList.add('ring-1', 'ring-error/50');
-            return;
-        }
-
-        errorMessage.classList.add('hidden');
-        urlInput.classList.remove('ring-1', 'ring-error/50');
-
-        // Loading State
-        generateBtn.disabled = true;
-        const originalText = generateBtn.textContent;
-        generateBtn.textContent = 'Forging Artifact...';
-        statusBlob.classList.remove('bg-primary', 'bg-outline');
-        statusBlob.classList.add('bg-secondary');
-        statusText.textContent = '"Channeling the data stream into the refractive matrix..."';
-
-        try {
-            const response = await fetch('/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    url: url,
-                    size: currentSize,
-                    color: "#000000" // Always black
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                // Display QR
-                qrcodeDiv.innerHTML = '';
-                qrPlaceholder.classList.add('hidden');
-                qrcodeDiv.classList.remove('hidden');
-                
-                const img = document.createElement('img');
-                img.src = data.qr_code;
-                img.className = "w-48 h-48 opacity-90";
-                qrcodeDiv.appendChild(img);
-                
-                currentQrBase64 = data.qr_code;
-                downloadBtn.disabled = false;
-                
-                statusBlob.classList.remove('bg-secondary');
-                statusBlob.classList.add('bg-primary');
-                statusText.textContent = '"The gateway has materialized. Your digital key is ready."';
-            } else {
-                throw new Error(data.error);
-            }
-        } catch (error) {
-            console.error(error);
-            statusBlob.classList.remove('bg-secondary', 'bg-primary');
-            statusBlob.classList.add('bg-error');
-            statusText.textContent = '"Stability lost. The matrix failed to collapse. Check your connection."';
-        } finally {
-            generateBtn.disabled = false;
-            generateBtn.textContent = originalText;
-        }
-    }
-
-    function clearAll() {
-        urlInput.value = '';
-        qrcodeDiv.innerHTML = '';
-        qrcodeDiv.classList.add('hidden');
-        qrPlaceholder.classList.remove('hidden');
-        downloadBtn.disabled = true;
-        errorMessage.classList.add('hidden');
-        urlInput.classList.remove('ring-1', 'ring-error/50');
-        statusBlob.classList.remove('bg-primary', 'bg-error', 'bg-secondary');
-        statusBlob.classList.add('bg-outline');
-        statusText.textContent = '"The path is ready. Your ethereal gateway will materialize here upon generation."';
-        currentQrBase64 = null;
-    }
-
-    function downloadQR() {
-        if (!currentQrBase64) return;
-        const link = document.createElement('a');
-        link.download = `velqr-artifact-${Date.now()}.png`;
-        link.href = currentQrBase64;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    // Listeners
+    // Generator
     generateBtn.addEventListener('click', generateQR);
     clearBtn.addEventListener('click', clearAll);
     downloadBtn.addEventListener('click', downloadQR);

@@ -6,11 +6,11 @@
       "destination": "/api/index"
     },
     {
-      "source": "/shorten",
+      "source": "/shorten_url",
       "destination": "/api/index"
     },
     {
-      "source": "/s/(.*)",
+      "source": "/velqr/(.*)",
       "destination": "/api/index"
     },
     {
