@@ -2,6 +2,10 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/api/check-availability/(.*)",
+      "destination": "/api/index"
+    },
+    {
       "source": "/generate",
       "destination": "/api/index"
     },
@@ -10,16 +14,12 @@
       "destination": "/api/index"
     },
     {
-      "source": "/velqr/(.*)",
-      "destination": "/api/index"
-    },
-    {
       "source": "/health",
       "destination": "/api/index"
     },
     {
       "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "destination": "/api/index"
     }
   ]
 }

@@ -180,6 +180,71 @@ document.addEventListener('DOMContentLoaded', () => {
     const shortenErrorMessage = document.getElementById('shorten-error-message');
     const shortenStatusBlob = document.getElementById('shorten-status-blob');
     const shortenStatusText = document.getElementById('shorten-status-text');
+    const customSlugInput = document.getElementById('custom-slug-input');
+    const availabilityBadge = document.getElementById('availability-badge');
+    const availabilityIcon = document.getElementById('availability-icon');
+    const availabilityText = document.getElementById('availability-text');
+    const slugErrorMessage = document.getElementById('slug-error-message');
+
+    let isSlugAvailable = true;
+    let debounceTimer;
+
+    // --- Slug Availability logic ---
+    async function checkSlugAvailability() {
+        const slug = customSlugInput.value.trim();
+        if (!slug) {
+            availabilityBadge.classList.add('hidden');
+            slugErrorMessage.classList.add('hidden');
+            isSlugAvailable = true;
+            return;
+        }
+
+        // Validate slug format (alphanumeric, dashes, underscores)
+        if (!/^[a-zA-Z0-9-_]+$/.test(slug)) {
+            availabilityBadge.classList.remove('hidden');
+            availabilityIcon.textContent = 'error';
+            availabilityIcon.className = 'material-symbols-outlined text-sm text-error';
+            availabilityText.textContent = 'Invalid Format';
+            availabilityText.className = 'text-[10px] font-bold uppercase tracking-wider text-error';
+            isSlugAvailable = false;
+            return;
+        }
+
+        availabilityBadge.classList.remove('hidden');
+        availabilityIcon.textContent = 'sync';
+        availabilityIcon.className = 'material-symbols-outlined text-sm text-secondary animate-spin';
+        availabilityText.textContent = 'Checking...';
+        availabilityText.className = 'text-[10px] font-bold uppercase tracking-wider text-secondary';
+
+        try {
+            const response = await fetch(`/api/check-availability/${slug}`);
+            const data = await response.json();
+            
+            if (data.available) {
+                availabilityIcon.textContent = 'check_circle';
+                availabilityIcon.className = 'material-symbols-outlined text-sm text-primary';
+                availabilityText.textContent = 'Available';
+                availabilityText.className = 'text-[10px] font-bold uppercase tracking-wider text-primary';
+                slugErrorMessage.classList.add('hidden');
+                isSlugAvailable = true;
+            } else {
+                availabilityIcon.textContent = 'cancel';
+                availabilityIcon.className = 'material-symbols-outlined text-sm text-error';
+                availabilityText.textContent = 'Taken';
+                availabilityText.className = 'text-[10px] font-bold uppercase tracking-wider text-error';
+                slugErrorMessage.classList.remove('hidden');
+                isSlugAvailable = false;
+            }
+        } catch (error) {
+            console.error('Availability check failed:', error);
+            availabilityBadge.classList.add('hidden');
+        }
+    }
+
+    customSlugInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(checkSlugAvailability, 500);
+    });
 
     // --- Short Code Helper ---
     function generateShortCode(length = 6) {
@@ -194,10 +259,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Shortening Logic ---
     async function shortenURL() {
         const url = shortenUrlInput.value.trim();
+        const customSlug = customSlugInput.value.trim();
         
         if (!isValidUrl(url)) {
             shortenErrorMessage.classList.remove('hidden');
             shortenUrlInput.classList.add('ring-1', 'ring-error/50');
+            return;
+        }
+
+        if (customSlug && !isSlugAvailable) {
+            slugErrorMessage.classList.remove('hidden');
+            customSlugInput.focus();
             return;
         }
 
@@ -216,18 +288,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const db = window.firebaseDb;
             const { collection, addDoc, getDocs, query, where, serverTimestamp } = window.dbUtils;
             
-            // 1. Check if URL already shortened
             const urlsRef = collection(db, "shortUrls");
-            const q = query(urlsRef, where("original_url", "==", url));
-            const querySnapshot = await getDocs(q);
-            
             let shortCode;
-            if (!querySnapshot.empty) {
-                shortCode = querySnapshot.docs[0].data().short_code;
+
+            if (customSlug) {
+                // Use custom slug
+                shortCode = customSlug;
+                // Double check availability one last time
+                const q = query(urlsRef, where("short_code", "==", shortCode));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    throw new Error("Slug already taken.");
+                }
             } else {
-                // 2. Generate new short code
-                shortCode = generateShortCode();
-                // Store in Firestore
+                // 1. Check if URL already shortened (only if no custom slug provided)
+                const q = query(urlsRef, where("original_url", "==", url));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    shortCode = querySnapshot.docs[0].data().short_code;
+                } else {
+                    // 2. Generate new short code
+                    shortCode = generateShortCode();
+                }
+            }
+
+            // Save if it's new (or if it's a custom slug that isn't saved yet)
+            const checkQuery = query(urlsRef, where("short_code", "==", shortCode));
+            const checkSnap = await getDocs(checkQuery);
+            
+            if (checkSnap.empty) {
                 await addDoc(urlsRef, {
                     original_url: url,
                     short_code: shortCode,
@@ -236,8 +326,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const baseUrl = window.location.origin;
-            const functionalUrl = `${baseUrl}/velqr/${shortCode}`;
-            const brandedUrl = `http://velqr/${shortCode}`;
+            // Support root-level URLs as requested
+            const functionalUrl = `${baseUrl}/${shortCode}`;
 
             shortenPlaceholder.classList.add('hidden');
             shortenResult.classList.remove('hidden');
@@ -266,6 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function clearShortener() {
         shortenUrlInput.value = '';
+        customSlugInput.value = '';
+        availabilityBadge.classList.add('hidden');
+        slugErrorMessage.classList.add('hidden');
         shortenPlaceholder.classList.remove('hidden');
         shortenResult.classList.add('hidden');
         shortenErrorMessage.classList.add('hidden');
@@ -273,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shortenStatusBlob.classList.remove('bg-primary', 'bg-error', 'bg-secondary');
         shortenStatusBlob.classList.add('bg-outline');
         shortenStatusText.textContent = '"Ready to distill your digital presence."';
+        isSlugAvailable = true;
     }
 
     function copyToClipboard() {
