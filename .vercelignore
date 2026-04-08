@@ -1,0 +1,6 @@
+backend/
+.git/
+node_modules/
+package-lock.json
+walkthrough.md
+README.md
