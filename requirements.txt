@@ -1,6 +1,4 @@
-django
-django-cors-headers
+firebase-admin
 flask
 flask-cors
-qrcode
-pillow
+requests

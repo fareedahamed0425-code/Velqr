@@ -1,14 +1,11 @@
-import os
 import sys
+import os
 
-# Add the backend_django directory to the path
-backend_path = os.path.join(os.path.dirname(__file__), '..', 'backend_django')
-if backend_path not in sys.path:
-    sys.path.insert(0, backend_path)
+# Add the root directory to path so we can import api.index
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+from api.index import app
 
 if __name__ == '__main__':
-    from django.core.management import execute_from_command_line
-    # Run on port 5000 to match the previous Flask setup
-    execute_from_command_line([sys.argv[0], 'runserver', '5000'])
+    # Run the same way the previous Flask app did
+    app.run(host='0.0.0.0', port=5000, debug=True)
