@@ -141,24 +141,109 @@ document.addEventListener('DOMContentLoaded', () => {
     const generatorSection = document.getElementById('generator-section');
     const shortenerSection = document.getElementById('shortener-section');
 
+    function updateIndicator(activeTab) {
+        const indicator = document.getElementById('nav-indicator');
+        if (!indicator || !activeTab) return;
+
+        const textSpan = activeTab.querySelector('span');
+        if (!textSpan) return;
+
+        // Use getBoundingClientRect for absolute precision relative to parent container
+        const container = document.getElementById('nav-container');
+        const containerRect = container.getBoundingClientRect();
+        const textRect = textSpan.getBoundingClientRect();
+
+        indicator.style.left = `${textRect.left - containerRect.left}px`;
+        indicator.style.width = `${textRect.width}px`;
+    }
+
     function switchTab(tab) {
+        const logo = document.getElementById('nav-logo');
+        const cursor = document.getElementById('cursor');
+        const footer = document.getElementById('main-footer');
+        const blob1 = document.getElementById('bg-blob-1');
+        const blob2 = document.getElementById('bg-blob-2');
+        const blob3 = document.getElementById('bg-blob-3');
+        const indicator = document.getElementById('nav-indicator');
+
         if (tab === 'generator') {
             generatorSection.classList.remove('hidden');
             shortenerSection.classList.add('hidden');
-            navGenerator.classList.add('text-[#00F5FF]', 'border-[#00F5FF]');
-            navGenerator.classList.remove('text-slate-400');
-            navShortener.classList.remove('text-[#00F5FF]', 'border-[#00F5FF]');
-            navShortener.classList.add('text-slate-400');
+            
+            // Activate Generator Tab (Cyan)
+            navGenerator.classList.add('text-[#00F5FF]');
+            navGenerator.classList.remove('text-slate-400', 'hover:text-white');
+            
+            // Deactivate Shortener Tab
+            navShortener.classList.remove('text-[#ff59e3]');
+            navShortener.classList.add('text-slate-400', 'hover:text-white');
+            
+            // Update Indicator
+            updateIndicator(navGenerator);
+            if (indicator) indicator.style.backgroundColor = '#00F5FF';
+            
+            // Theme adjustments
+            if (logo) logo.style.filter = 'drop-shadow(0 0 8px rgba(0, 245, 255, 0.5))';
+            if (cursor) cursor.style.backgroundColor = 'rgba(0, 245, 255, 0.3)';
+            
+            if (footer) {
+                footer.classList.remove('footer-pink');
+                footer.classList.add('footer-cyan');
+            }
+            
+            if (blob1) blob1.className = blob1.className.replace(/bg-\[.*?\]|bg-\w+\/\d+/g, 'bg-primary/10');
+            if (blob2) blob2.className = blob2.className.replace(/bg-\[.*?\]|bg-\w+\/\d+/g, 'bg-tertiary/10');
+            if (blob3) blob3.className = blob3.className.replace(/bg-\[.*?\]|bg-\w+\/\d+/g, 'bg-secondary/5');
+
         } else {
             generatorSection.classList.add('hidden');
             shortenerSection.classList.remove('hidden');
-            navShortener.classList.add('text-[#00F5FF]', 'border-[#00F5FF]');
-            navShortener.classList.remove('text-slate-400');
-            navGenerator.classList.remove('text-[#00F5FF]', 'border-[#00F5FF]');
-            navGenerator.classList.add('text-slate-400');
+            
+            // Activate Shortener Tab (Pink)
+            navShortener.classList.add('text-[#ff59e3]');
+            navShortener.classList.remove('text-slate-400', 'hover:text-white');
+            
+            // Deactivate Generator Tab
+            navGenerator.classList.remove('text-[#00F5FF]');
+            navGenerator.classList.add('text-slate-400', 'hover:text-white');
+
+            // Update Indicator
+            updateIndicator(navShortener);
+            if (indicator) indicator.style.backgroundColor = '#ff59e3';
+            
+            // Theme adjustments
+            if (logo) logo.style.filter = 'drop-shadow(0 0 8px rgba(255, 89, 227, 0.5))';
+            if (cursor) cursor.style.backgroundColor = 'rgba(255, 89, 227, 0.3)';
+
+            if (footer) {
+                footer.classList.remove('footer-cyan');
+                footer.classList.add('footer-pink');
+            }
+
+            if (blob1) blob1.className = blob1.className.replace(/bg-\[.*?\]|bg-\w+\/\d+/g, 'bg-secondary/10');
+            if (blob2) blob2.className = blob2.className.replace(/bg-\[.*?\]|bg-\w+\/\d+/g, 'bg-tertiary/10');
+            if (blob3) blob3.className = blob3.className.replace(/bg-\[.*?\]|bg-\w+\/\d+/g, 'bg-primary/5');
         }
     }
 
+    // Initialize indicator and theme on load
+    window.addEventListener('load', () => {
+        switchTab('generator');
+        setTimeout(() => updateIndicator(navGenerator), 100);
+    });
+    
+    // Fallback if load already fired
+    if (document.readyState === 'complete') {
+        switchTab('generator');
+        setTimeout(() => updateIndicator(navGenerator), 100);
+    }
+
+    window.addEventListener('resize', () => {
+        const activeTab = generatorSection.classList.contains('hidden') ? navShortener : navGenerator;
+        updateIndicator(activeTab);
+    });
+
+    // --- Tab Switch Listeners ---
     navGenerator.addEventListener('click', (e) => {
         e.preventDefault();
         switchTab('generator');

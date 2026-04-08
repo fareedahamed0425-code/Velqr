@@ -101,3 +101,22 @@ body {
 .animate-float {
     animation: float 3s ease-in-out infinite;
 }
+
+/* Theme Utilities */
+.theme-cyan .bg-theme-blob {
+    background-color: rgba(0, 245, 255, 0.1);
+}
+.theme-pink .bg-theme-blob {
+    background-color: rgba(255, 89, 227, 0.1);
+}
+
+.footer-cyan::before {
+    background: linear-gradient(to right, transparent, rgba(0, 245, 255, 0.2), transparent) !important;
+}
+.footer-pink::before {
+    background: linear-gradient(to right, transparent, rgba(255, 89, 227, 0.2), transparent) !important;
+}
+
+#nav-logo, #cursor {
+    transition: background-color 0.5s ease, filter 0.5s ease;
+}

@@ -93,23 +93,25 @@
         id="cursor"></div>
     <!-- Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div class="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full"></div>
-        <div class="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-tertiary/10 blur-[120px] rounded-full"></div>
-        <div class="absolute top-[20%] right-[10%] w-[20%] h-[20%] bg-secondary/5 blur-[80px] rounded-full"></div>
+        <div id="bg-blob-1" class="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full transition-all duration-1000"></div>
+        <div id="bg-blob-2" class="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-tertiary/10 blur-[120px] rounded-full transition-all duration-1000"></div>
+        <div id="bg-blob-3" class="absolute top-[20%] right-[10%] w-[20%] h-[20%] bg-secondary/5 blur-[80px] rounded-full transition-all duration-1000"></div>
     </div>
     <!-- Navigation -->
     <nav
         class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-2xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]">
         <div
             class="flex justify-between items-center px-4 md:px-8 h-20 max-w-7xl mx-auto font-['Plus_Jakarta_Sans'] tracking-wider">
-            <div class="text-2xl font-bold tracking-tighter text-white drop-shadow-[0_0_8px_rgba(0,245,255,0.5)]">
+            <div id="nav-logo" class="text-2xl font-bold tracking-tighter text-white transition-all duration-500" style="filter: drop-shadow(0 0 8px rgba(0,245,255,0.5))">
                 Velqr
             </div>
-            <div class="flex items-center space-x-4 md:space-x-8">
-                <a class="nav-link text-[#00F5FF] border-b-2 border-[#00F5FF] pb-1 cursor-pointer text-xs md:text-base whitespace-nowrap"
-                    id="nav-generator" href="#">Generator</a>
-                <a class="nav-link text-slate-400 hover:text-white transition-all cursor-pointer text-xs md:text-base whitespace-nowrap"
-                    id="nav-shortener" href="#">Shorten URL</a>
+            <div class="flex items-center relative" id="nav-container">
+                <a class="nav-link text-[#00F5FF] cursor-pointer text-xs md:text-base whitespace-nowrap transition-colors duration-300 px-4 py-2 inline-flex items-center"
+                    id="nav-generator" href="#"><span>Generator</span></a>
+                <a class="nav-link text-slate-400 hover:text-white transition-colors duration-300 cursor-pointer text-xs md:text-base whitespace-nowrap px-4 py-2 inline-flex items-center"
+                    id="nav-shortener" href="#"><span>Shorten URL</span></a>
+                <!-- Sliding Indicator -->
+                <div id="nav-indicator" class="absolute bottom-0 h-0.5 bg-[#00F5FF] transition-all duration-300 ease-out"></div>
             </div>
             <div class="flex items-center gap-4">
                 <span
@@ -348,8 +350,8 @@
         </div>
     </main>
     <!-- Footer -->
-    <footer
-        class="w-full py-16 mt-auto bg-slate-950/60 backdrop-blur-3xl tonal-shift relative before:absolute before:top-0 before:left-0 before:w-full before:h-px before:bg-gradient-to-r before:from-transparent before:via-[#00F5FF]/20 before:to-transparent">
+    <footer id="main-footer"
+        class="w-full py-16 mt-auto bg-slate-950/60 backdrop-blur-3xl tonal-shift relative before:absolute before:top-0 before:left-0 before:w-full before:h-px footer-cyan before:transition-all before:duration-1000">
         <div class="max-w-7xl mx-auto px-8 space-y-12">
             <!-- Top Section -->
             <div class="flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
