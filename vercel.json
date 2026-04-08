@@ -6,6 +6,14 @@
       "destination": "/api/index"
     },
     {
+      "source": "/shorten",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/s/(.*)",
+      "destination": "/api/index"
+    },
+    {
       "source": "/health",
       "destination": "/api/index"
     },

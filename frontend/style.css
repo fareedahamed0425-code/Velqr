@@ -3,28 +3,11 @@ body {
     overflow-x: hidden;
 }
 
-@media (min-width: 768px) {
-    body {
-        cursor: none;
-    }
-}
 
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-.custom-cursor {
-    width: 20px;
-    height: 20px;
-    background: rgba(161, 250, 255, 0.3);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    backdrop-filter: blur(4px);
-    transition: transform 0.1s ease-out;
-    mix-blend-mode: screen;
-}
 
 .glass-panel {
     backdrop-filter: blur(24px);

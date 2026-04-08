@@ -89,7 +89,8 @@
 </head>
 
 <body class="bg-background text-on-surface min-h-screen flex flex-col">
-    <div class="custom-cursor hidden md:block" id="cursor"></div>
+    <div class="custom-cursor hidden md:block fixed w-8 h-8 rounded-full bg-[#00F5FF]/30 blur-[2px] pointer-events-none z-[100] transition-transform duration-200"
+        id="cursor"></div>
     <!-- Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <div class="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full"></div>
@@ -104,8 +105,11 @@
             <div class="text-2xl font-bold tracking-tighter text-white drop-shadow-[0_0_8px_rgba(0,245,255,0.5)]">
                 Velqr
             </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a class="text-[#00F5FF] border-b-2 border-[#00F5FF] pb-1" href="#">Generator</a>
+            <div class="flex items-center space-x-4 md:space-x-8">
+                <a class="nav-link text-[#00F5FF] border-b-2 border-[#00F5FF] pb-1 cursor-pointer text-xs md:text-base whitespace-nowrap"
+                    id="nav-generator" href="#">Generator</a>
+                <a class="nav-link text-slate-400 hover:text-white transition-all cursor-pointer text-xs md:text-base whitespace-nowrap"
+                    id="nav-shortener" href="#">Shorten URL</a>
             </div>
             <div class="flex items-center gap-4">
                 <span
@@ -118,7 +122,8 @@
         <div class="w-full max-w-4xl relative">
             <!-- Decorative Element -->
             <div class="absolute -top-12 -left-12 w-32 h-32 iridescent-glow blur-[60px] opacity-30 animate-pulse"></div>
-            <div
+            <!-- QR Generator Section -->
+            <div id="generator-section"
                 class="glass-panel gradient-border rounded-xl p-6 md:p-12 flex flex-col md:flex-row gap-8 md:gap-12 items-start relative z-10 overflow-hidden">
                 <!-- Left Column: Input Form -->
                 <div class="flex-1 space-y-10 w-full">
@@ -172,11 +177,13 @@
                         <div class="flex gap-4">
                             <button id="clear-btn"
                                 class="flex-1 py-4 px-2 rounded-full bg-white/5 border border-white/10 text-on-surface-variant font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-1.5 md:gap-2">
-                                <span class="material-symbols-outlined text-lg">delete</span> <span class="text-xs md:text-base">Clear</span>
+                                <span class="material-symbols-outlined text-lg">delete</span> <span
+                                    class="text-xs md:text-base">Clear</span>
                             </button>
                             <button id="download-btn" disabled
                                 class="flex-1 py-4 px-2 rounded-full bg-white/5 border border-white/10 text-on-surface-variant font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-1.5 md:gap-2 disabled:opacity-30 disabled:cursor-not-allowed">
-                                <span class="material-symbols-outlined text-lg">download</span> <span class="text-xs md:text-base">Download</span>
+                                <span class="material-symbols-outlined text-lg">download</span> <span
+                                    class="text-xs md:text-base">Download</span>
                             </button>
                         </div>
                     </div>
@@ -217,6 +224,103 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Shorten URL Section -->
+            <div id="shortener-section"
+                class="hidden glass-panel gradient-border rounded-xl p-6 md:p-12 flex flex-col md:flex-row gap-8 md:gap-12 items-start relative z-10 overflow-hidden">
+                <!-- Left Column: Input Form -->
+                <div class="flex-1 space-y-10 w-full">
+                    <header>
+                        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-3">
+                            Shorten your <span class="text-secondary text-glow">Large URL</span>
+                        </h1>
+                        <p class="text-on-surface-variant font-medium uppercase tracking-[0.2rem] text-[0.65rem]">
+                            Premium URL Shortener</p>
+                    </header>
+                    <div class="space-y-8">
+                        <!-- URL Input -->
+                        <div class="space-y-3">
+                            <label
+                                class="text-[0.75rem] font-bold uppercase tracking-[0.1rem] text-secondary/80 ml-1">Long
+                                URL</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                    <span
+                                        class="material-symbols-outlined text-secondary/40 group-focus-within:text-secondary transition-colors">link</span>
+                                </div>
+                                <input id="shorten-url-input"
+                                    class="w-full bg-surface-container-lowest border-none rounded-2xl py-5 pl-12 md:pl-14 pr-4 md:pr-6 text-on-surface placeholder:text-outline focus:ring-1 focus:ring-secondary/30 transition-all outline-none text-base md:text-lg"
+                                    placeholder="https://your-massive-data-stream.com/very/long/path" type="text" />
+                                <div
+                                    class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-secondary/40 to-transparent scale-x-0 group-focus-within:scale-x-100 transition-transform duration-500">
+                                </div>
+                            </div>
+                            <p id="shorten-error-message" class="text-error text-xs ml-1 hidden">Please enter a valid
+                                URL.</p>
+                        </div>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col gap-4 pt-4">
+                        <button id="shorten-btn"
+                            class="liquid-button w-full py-5 rounded-full bg-secondary/20 border border-secondary/40 text-secondary font-black uppercase tracking-widest text-sm shadow-[0_0_30px_rgba(255,89,227,0.2)] hover:shadow-[0_0_50px_rgba(255,89,227,0.4)] active:scale-95 transition-all">
+                            Shorten URL
+                        </button>
+                        <div class="flex gap-4">
+                            <button id="shorten-clear-btn"
+                                class="flex-1 py-4 px-2 rounded-full bg-white/5 border border-white/10 text-on-surface-variant font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-1.5 md:gap-2">
+                                <span class="material-symbols-outlined text-lg">delete</span> <span
+                                    class="text-xs md:text-base">Clear</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Column: Result Area -->
+                <div class="w-full md:w-[320px] shrink-0 space-y-6">
+                    <div class="aspect-square glass-panel rounded-xl flex items-center justify-center relative group overflow-hidden border border-white/5"
+                        id="shorten-display-container">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-tr from-secondary/5 via-transparent to-primary/5 opacity-50">
+                        </div>
+                        <!-- Placeholder/Result -->
+                        <div id="shorten-content" class="text-center space-y-6 px-4 relative z-10 w-full">
+                            <div id="shorten-placeholder" class="text-center space-y-4">
+                                <span
+                                    class="material-symbols-outlined text-secondary/40 text-6xl font-light scale-150 block mb-2">compress</span>
+                                <p class="text-outline text-[0.65rem] font-bold uppercase tracking-widest">Awaiting
+                                    Compression</p>
+                            </div>
+                            <div id="shorten-result" class="hidden space-y-4 w-full">
+                                <p class="text-xs font-bold uppercase tracking-widest text-secondary/80">Shortened Link
+                                </p>
+                                <div class="bg-surface-container-highest p-4 rounded-xl border border-white/10 break-all select-all font-mono text-sm text-white"
+                                    id="short-url-text">
+                                    velqr/shorten_url
+                                </div>
+                                <button id="copy-btn"
+                                    class="text-xs font-bold text-primary hover:text-white transition-colors flex items-center justify-center gap-2 mx-auto">
+                                    <span class="material-symbols-outlined text-sm">content_copy</span> Copy to
+                                    Clipboard
+                                </button>
+                                <a id="test-link" target="_blank" class="text-[10px] font-bold text-secondary/70 hover:text-secondary transition-colors flex items-center justify-center gap-1 mx-auto cursor-pointer">
+                                    <span class="material-symbols-outlined text-xs">open_in_new</span> Test Redirection
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-surface-container-low rounded-lg space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span
+                                class="text-[0.65rem] font-bold uppercase tracking-wider text-on-surface-variant">Compression
+                                Status</span>
+                            <span id="shorten-status-blob"
+                                class="flex h-2 w-2 rounded-full bg-outline animate-pulse"></span>
+                        </div>
+                        <p id="shorten-status-text" class="text-[0.85rem] text-on-surface/70 leading-relaxed italic">
+                            "Ready to distill your digital presence."
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
     <!-- Footer -->
@@ -226,12 +330,14 @@
             <!-- Top Section -->
             <div class="flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
                 <div class="text-2xl font-black text-white tracking-tighter">Velqr</div>
-                <div class="flex flex-wrap justify-center gap-6 md:gap-8 text-slate-500 font-['Plus_Jakarta_Sans'] text-[10px] md:text-xs uppercase tracking-[0.15rem] md:tracking-[0.2rem]">
+                <div
+                    class="flex flex-wrap justify-center gap-6 md:gap-8 text-slate-500 font-['Plus_Jakarta_Sans'] text-[10px] md:text-xs uppercase tracking-[0.15rem] md:tracking-[0.2rem]">
                     <a class="hover:text-[#00F5FF] transition-colors" href="#">Privacy Policy</a>
                     <a class="hover:text-[#00F5FF] transition-colors" href="#">Terms of Service</a>
                     <a class="hover:text-[#00F5FF] transition-colors" href="#">API Docs</a>
                 </div>
-                <div class="text-slate-500 font-['Plus_Jakarta_Sans'] text-[10px] md:text-xs uppercase tracking-[0.1rem]">
+                <div
+                    class="text-slate-500 font-['Plus_Jakarta_Sans'] text-[10px] md:text-xs uppercase tracking-[0.1rem]">
                     © 2024 Ethereal Monolith Labs.
                 </div>
             </div>
