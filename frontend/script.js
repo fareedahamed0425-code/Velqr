@@ -79,15 +79,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Wait a bit for QRCode.js to render (it's synchronous but sometimes takes a tick to mount the img)
             setTimeout(() => {
+                // Prefer canvas for reliable data URL on all browsers including mobile
+                const canvas = tempDiv.querySelector('canvas');
                 const generatedImg = tempDiv.querySelector('img');
-                const qrBase64 = generatedImg ? generatedImg.src : tempDiv.querySelector('canvas').toDataURL("image/png");
-                
+                let qrBase64;
+                if (canvas) {
+                    qrBase64 = canvas.toDataURL('image/png');
+                } else if (generatedImg && generatedImg.src.startsWith('data:')) {
+                    qrBase64 = generatedImg.src;
+                } else if (generatedImg) {
+                    // Fallback: draw image onto canvas to get data URL
+                    const fallbackCanvas = document.createElement('canvas');
+                    fallbackCanvas.width = currentSize;
+                    fallbackCanvas.height = currentSize;
+                    fallbackCanvas.getContext('2d').drawImage(generatedImg, 0, 0);
+                    qrBase64 = fallbackCanvas.toDataURL('image/png');
+                }
+
                 qrPlaceholder.classList.add('hidden');
                 qrcodeDiv.classList.remove('hidden');
                 
                 const img = document.createElement('img');
                 img.src = qrBase64;
-                img.className = "w-48 h-48 opacity-90";
+                // Responsive: fill container on mobile, fixed on desktop
+                img.className = 'w-full h-full object-contain opacity-90';
+                img.alt = 'Generated QR Code';
                 qrcodeDiv.appendChild(img);
                 
                 currentQrBase64 = qrBase64;
@@ -127,12 +143,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function downloadQR() {
         if (!currentQrBase64) return;
-        const link = document.createElement('a');
-        link.download = `velqr-artifact-${Date.now()}.png`;
-        link.href = currentQrBase64;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        try {
+            // Convert data URL to Blob for reliable download on mobile browsers
+            const byteString = atob(currentQrBase64.split(',')[1]);
+            const mimeString = currentQrBase64.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+            const blob = new Blob([ab], { type: mimeString });
+            const blobUrl = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.download = `velqr-artifact-${Date.now()}.png`;
+            link.href = blobUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            // Release memory
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        } catch (e) {
+            // Fallback for environments without Blob support
+            const link = document.createElement('a');
+            link.download = `velqr-artifact-${Date.now()}.png`;
+            link.href = currentQrBase64;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     }
 
     // --- Tab Switching Logic ---
